@@ -1,13 +1,13 @@
 {
   "name": "ts-odoo",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Typescript Odoo Connector",
   "main": "./lib/bootstrap.js",
   "typings": "/lib/index.d.ts",
   "scripts": {
     "test": " tsc -p tsconfig.tests.json && alsatian \"./tests/tests/*.test.js\"",
     "build": "tsc",
-    "dts-gen": "dts-generator --name \"ts-odoo\" --project . -out .\\dist\\ts-odoo.d.ts"
+    "ts_dev": "tsc -w -p tsconfig.json"
   },
   "repository": {
     "type": "git",
@@ -31,6 +31,7 @@
     "bunyan": "^1.8.12",
     "inversify": "^4.3.0",
     "lodash": "^4.17.4",
+    "memory-cache": "^0.2.0",
     "odoo-xmlrpc": "^1.0.6"
   }
 }

@@ -1,6 +1,6 @@
 import {OdooConfiguration} from "./Config/OdooConfiguration";
 import {ILogger} from "./Logger/ILogger";
-import {OdooIoCConfig} from "./ioc.config";
+import {OdooIoCConfig} from "./OdooIoCConfig";
 import {Odoo} from "./Odoo";
 
 export class OdooFactory {
@@ -10,8 +10,9 @@ export class OdooFactory {
      * @param {ILogger} logger
      * @returns {Odoo}
      */
-    public static createOdoo(configuration: OdooConfiguration, logger?: ILogger) : Odoo {
+    public static createOdoo(configuration: OdooConfiguration, logger?: ILogger): Odoo {
         const odooIoC = new OdooIoCConfig();
-        return odooIoC.init(configuration, logger)
+        odooIoC.init(configuration, logger);
+        return odooIoC.getOdoo();
     }
 }

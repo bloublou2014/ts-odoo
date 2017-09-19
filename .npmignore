@@ -1,0 +1,12 @@
+.git/
+node_modules/
+src/
+build/
+test/
+typings/
+npm-debug.log
+tsconfig.json
+typings.json
+.gitignore
+.gitkeep
+.npmignore

@@ -9,6 +9,7 @@ import {Serial} from "./Entities/Inventory/Serial";
 import {Warehouse} from "./Entities/Inventory/Warehouse";
 import {OdooInventory} from "./API/OdooInventory";
 import {OdooModel} from "./API/OdooModel";
+import {OdooEmployees} from "./API/OdooEmployees";
 import {Odoo} from "./Odoo";
 import {OdooFactory} from "./OdooFactory";
 import {OdooConfiguration} from "./Config/OdooConfiguration";
@@ -28,7 +29,9 @@ const Entities = {
 };
 
 const Api = {
-    OdooModel
+    OdooModel,
+    OdooInventory,
+    OdooEmployees
 };
 
 const Config = {
@@ -37,11 +40,11 @@ const Config = {
 };
 
 export {
+    Api,
+    Config,
+    Entities,
     Odoo,
     OdooFactory,
-    OdooModel,
-    Entities,
-    Config
 };
 
 

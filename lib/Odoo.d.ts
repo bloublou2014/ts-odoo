@@ -11,4 +11,9 @@ export declare class Odoo {
      */
     getInventory(): OdooInventory;
     getEmployees(): OdooEmployees;
+    /**
+     * setup available modules to Inversify IOC Container
+     * @param {Container} container
+     */
+    setupInversify(container: Container): void;
 }
