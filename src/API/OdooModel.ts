@@ -20,15 +20,15 @@ export class OdooModel {
 
     protected model = "ir.model";
 
-    protected fields = [];
+    protected fields = [
+        "info", "access_ids", "name", "field_id", "modules",
+        "state", "transient", "model", "view_ids", "id",
+        "display_name", "__last_update"
+    ];
 
     public getModels(query = [], fields = []) {
         if (!fields || fields.length < 1) {
-            fields = [
-                "product_id", "partner_id", "filter", "company_id", "move_ids",
-                "package_id", "state", "lot_id", "date", "line_ids", "location_id",
-                "accounting_date", "name", "display_name", "__last_update"
-            ];
+            fields = this.fields;
         }
 
         return this.odoo.searchReadWithCount(null, this.model, query, fields)

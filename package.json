@@ -5,6 +5,7 @@
   "main": "./lib/bootstrap.js",
   "typings": "/lib/index.d.ts",
   "scripts": {
+    "build_test": " tsc -p tsconfig.tests.json",
     "test": " tsc -p tsconfig.tests.json && alsatian \"./tests/tests/*.test.js\"",
     "build": "tsc",
     "ts_dev": "tsc -w -p tsconfig.json"
@@ -25,7 +26,8 @@
   },
   "homepage": "https://github.com/bloublou2014/ts-odoo#readme",
   "devDependencies": {
-    "alsatian": "^2.0.0"
+    "alsatian": "^2.0.0",
+    "typescript": "^2.5.2"
   },
   "dependencies": {
     "bunyan": "^1.8.12",

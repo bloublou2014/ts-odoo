@@ -26,7 +26,6 @@ export class Odoo {
         return this.container.get(OdooEmployees);
     }
 
-
     /**
      * setup available modules to Inversify IOC Container
      * @param {Container} container

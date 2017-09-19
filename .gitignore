@@ -53,3 +53,7 @@ fabric.properties
 /.idea
 /node_modules
 /package-lock.json
+/cli
+/src/tests/Config.ts
+/tests
+.idea
