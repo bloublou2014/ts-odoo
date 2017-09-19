@@ -8,7 +8,7 @@ export class OdooConfiguration {
      */
     public database: string;
 
-    public companies: OdooCompany[];
+    public companies: OdooCompany[] = [];
 
-    public applications : OdooApplications;
+    public applications: OdooApplications = new OdooApplications();
 }

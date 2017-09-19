@@ -3,8 +3,8 @@ import {OdooXmlRpcConfiguration} from "./OdooXmlRpcConfiguration";
 
 export class OdooApplications {
 
-    public inventory: OdooInventoryConfiguration;
+    public inventory: OdooInventoryConfiguration = new OdooInventoryConfiguration();
 
-    public xmlRpc: OdooXmlRpcConfiguration;
+    public xmlRpc: OdooXmlRpcConfiguration = new OdooXmlRpcConfiguration();
 
 }

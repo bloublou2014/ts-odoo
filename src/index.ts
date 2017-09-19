@@ -11,6 +11,9 @@ import {OdooInventory} from "./API/OdooInventory";
 import {OdooModel} from "./API/OdooModel";
 import {Odoo} from "./Odoo";
 import {OdooFactory} from "./OdooFactory";
+import {OdooConfiguration} from "./Config/OdooConfiguration";
+import {OdooCompany} from "./Config/OdooCompany";
+
 
 const Entities = {
     Category,
@@ -28,11 +31,17 @@ const Api = {
     OdooModel
 };
 
+const Config = {
+    OdooConfiguration,
+    OdooCompany
+};
+
 export {
     Odoo,
     OdooFactory,
     OdooModel,
-    Entities
+    Entities,
+    Config
 };
 
 

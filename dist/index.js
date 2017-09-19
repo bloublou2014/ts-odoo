@@ -15,6 +15,8 @@ const Odoo_1 = require("./Odoo");
 exports.Odoo = Odoo_1.Odoo;
 const OdooFactory_1 = require("./OdooFactory");
 exports.OdooFactory = OdooFactory_1.OdooFactory;
+const OdooConfiguration_1 = require("./Config/OdooConfiguration");
+const OdooCompany_1 = require("./Config/OdooCompany");
 const Entities = {
     Category: Category_1.Category,
     Company: Company_1.Company,
@@ -30,3 +32,8 @@ exports.Entities = Entities;
 const Api = {
     OdooModel: OdooModel_1.OdooModel
 };
+const Config = {
+    OdooConfiguration: OdooConfiguration_1.OdooConfiguration,
+    OdooCompany: OdooCompany_1.OdooCompany
+};
+exports.Config = Config;
