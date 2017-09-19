@@ -1,0 +1,36 @@
+{
+  "name": "ts-odoo",
+  "version": "0.1.0",
+  "description": "Typescript Odoo Connector",
+  "main": "./dist/bootstrap.js",
+  "typings": "/ts-odoo.d.ts",
+  "scripts": {
+    "test": " tsc -p tsconfig.tests.json && alsatian \"./tests/tests/*.test.js\"",
+    "build": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bloublou2014/ts-odoo.git"
+  },
+  "keywords": [
+    "Odoo",
+    "Connector",
+    "Typescript"
+  ],
+  "author": "BlouBlou2014",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/bloublou2014/ts-odoo/issues"
+  },
+  "homepage": "https://github.com/bloublou2014/ts-odoo#readme",
+  "devDependencies": {
+    "alsatian": "^2.0.0"
+  },
+  "dependencies": {
+    "bunyan": "^1.8.12",
+    "inversify": "^4.3.0",
+    "lodash": "^4.17.4",
+    "odoo-xmlrpc": "^1.0.6",
+    "tern": "^0.21.0"
+  }
+}

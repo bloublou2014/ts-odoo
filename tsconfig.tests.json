@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "outDir": "tests",
+    "module": "commonjs",
+    "target": "es6",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "declaration": false,
+    "noImplicitAny": false,
+    "noImplicitUseStrict": false,
+    "removeComments": true,
+    "noLib": false,
+    "preserveConstEnums": true,
+    "suppressImplicitAnyIndexErrors": true,
+    "sourceMap": true
+  },
+  "include": [
+    "src/tests/**.test.ts"
+  ],
+  "compileOnSave": true,
+  "buildOnSave": false
+}
