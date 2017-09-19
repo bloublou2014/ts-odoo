@@ -10,6 +10,7 @@ import {OdooEmployees} from "./API/OdooEmployees";
 import {OdooXmlRpcConfiguration} from "./Config/OdooXmlRpcConfiguration";
 import {OdooModel} from "./API/OdooModel";
 import {OdooRpc} from "./RPC/OdooRpc";
+import {OdooXmlRpc} from "./RPC/OdooXmlRpc";
 
 export class OdooIoCConfig {
 
@@ -27,7 +28,7 @@ export class OdooIoCConfig {
         this.setupConfiguration(configuration);
 
         // logger
-        const loggerInstance = logger !== null ? logger : OdooIoCConfig.getDefaultLogger();
+        const loggerInstance = logger ? logger : OdooIoCConfig.getDefaultLogger();
         container.bind<ILogger>(ILogger).toConstantValue(loggerInstance);
 
         // components

@@ -57,3 +57,6 @@ fabric.properties
 /src/tests/Config.ts
 /tests
 .idea
+/lib/tests/Config.d.ts
+/lib/tests/Config.js
+/lib/tests/Config.js.map

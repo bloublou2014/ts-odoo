@@ -1,5 +1,4 @@
-import {AsyncTest, Expect, Test, TestFixture} from "alsatian";
-import {inject} from "inversify";
+import {AsyncTest, Expect, Test, TestFixture, Timeout} from "alsatian";
 
 import configuration from "./Config";
 import * as TsOdoo from "../index";
@@ -36,6 +35,7 @@ export class OdooRpcMockTest {
     }
 
     @AsyncTest()
+    @Timeout(15000)
     public async shouldGetModel() {
         const odoo = this.getOdoo();
         Expect(odoo).toBeDefined();

@@ -1,6 +1,5 @@
 import {inject, injectable} from "inversify";
 
-import * as  OdooXmlRpc from "odoo-xmlrpc";
 import * as _ from "lodash";
 import {ILogger} from "../Logger/ILogger";
 import {OdooConfiguration} from "../Config/OdooConfiguration";
@@ -10,9 +9,9 @@ import {Company} from "../Entities/Common/Company";
 import {OdooCountResult} from "./OdooCountResult";
 import {OdooXmlRpcConfiguration} from "../Config/OdooXmlRpcConfiguration";
 import {IOdooRpc, OdooOperation} from "./IOdooRpc";
+import {OdooXmlRpc} from "./OdooXmlRpc";
 
 const CacheClass = require("memory-cache").Cache;
-
 
 @injectable()
 export class OdooRpc implements IOdooRpc {
@@ -32,7 +31,7 @@ export class OdooRpc implements IOdooRpc {
 
     /**
      * Create and Get
-     * @returns {any}
+     * @returns any
      */
     protected getCache(): any {
         if (!this.xmlRpcConfig.cache) {
@@ -49,12 +48,15 @@ export class OdooRpc implements IOdooRpc {
      * @param {OdooCompany} company
      * @returns {}
      */
-    protected getCachedConnection(company: OdooCompany): OdooXmlRpc {
-        if (!this.xmlRpcConfig.cache) {
-            return null;
-        }
-        this.logger.debug("Search Cache Odoo connection for %s (%s)", company.name, company.id);
-        return this.getCache().get(company.id);
+    protected getCachedConnection(company: OdooCompany): Promise<OdooXmlRpc> {
+        return new Promise(success => {
+            if (!this.xmlRpcConfig.cache) {
+                success(null);
+                return;
+            }
+            this.logger.debug("Search Cache Odoo connection for %s (%s)", company.name, company.id);
+            success(this.getCache().get(company.id));
+        });
     }
 
     /**
@@ -79,34 +81,32 @@ export class OdooRpc implements IOdooRpc {
      * @returns {Promise<>}
      */
     public getOdooConnection(company: OdooCompany): Promise<OdooXmlRpc> {
-        const self = this;
-        return new Promise(function (success, error) {
-            const cachedConnection = self.getCachedConnection(company);
-            if (cachedConnection) {
-                self.logger.debug("Use Cache Odoo connection for %s", company.name);
-                success(cachedConnection);
-                return;
-            }
-
-            const odooConfiguration = {
-                url: self.getOdooUrl(),
-                db: self.config.database,
-                username: company.username,
-                password: company.password
-            };
-
-            const odoo = new OdooXmlRpc(odooConfiguration);
-            odoo.connect(function (err) {
-                if (err) {
-                    self.logger.error("Error connecting to Odoo server %s with %s", odooConfiguration.url, odooConfiguration.username);
-                    error(err);
-                    return;
+        return this.getCachedConnection(company)
+            .then(cachedConnection => {
+                if (cachedConnection) {
+                    this.logger.debug("Use Cache Odoo connection for %s", company.name);
+                    return cachedConnection;
                 }
-                self.logger.debug("Connected to Odoo server %s with %s", odooConfiguration.url, odooConfiguration.username);
-                self.setCachedConnection(company, odoo);
-                success(odoo);
+
+                const odooConfiguration = {
+                    url: this.getOdooUrl(),
+                    db: this.config.database,
+                    username: company.username,
+                    password: company.password
+                };
+                const odoo = new OdooXmlRpc(odooConfiguration);
+                return odoo.connect()
+                    .then(connection => {
+                        this.logger.debug("Connected to Odoo server %s with %s", odooConfiguration.url, odooConfiguration.username);
+                        this.setCachedConnection(company, connection);
+                        return connection;
+                    })
+                    .catch(err => {
+                        this.logger.error("Error connecting to Odoo server %s with %s", odooConfiguration.url, odooConfiguration.username);
+                        this.logger.error(err);
+                        throw err;
+                    });
             });
-        });
     }
 
     /**
@@ -134,19 +134,10 @@ export class OdooRpc implements IOdooRpc {
         if (limit == null) {
             limit = this.xmlRpcConfig.defaultLimit;
         }
-        const self = this;
-        return new Promise(function (success, error) {
-            self.getOdooConnection(company)
-                .then(odoo => {
-                    return self.searchOneIncremental(odoo, model, query, fields, from, limit);
-                })
-                .then(res => {
-                    success(res);
-                })
-                .catch(function (err) {
-                    error(err);
-                });
-        })
+        return this.getOdooConnection(company)
+            .then(odoo => {
+                return this.searchOneIncremental(odoo, model, query, fields, from, limit);
+            })
             .then(res => {
                 const t = new OdooSearchResult();
                 t.company = OdooRpc.fromOdooCompany(company);
@@ -165,39 +156,27 @@ export class OdooRpc implements IOdooRpc {
      * @param {number} limit
      * @returns {Promise}
      */
-    protected searchOneIncremental(odoo: OdooXmlRpc, model: string, query = [], fields = [], from = 0, limit: number = null) {
+    protected searchOneIncremental(odoo: OdooXmlRpc, model: string, query = [], fields = [], from = 0, limit: number = null): Promise<any> {
         if (limit == null) {
             limit = this.xmlRpcConfig.defaultLimit;
         }
         const self = this;
-        return new Promise(function (success, error) {
-            const inParams = [];
-            inParams.push(query || []);
-            inParams.push(fields || []);
-            inParams.push(from); // offset
-            inParams.push(limit); // limit
 
-            const params = [];
-            params.push(inParams);
-            odoo.execute_kw(model, OdooOperation.searchRead, params,
-                function (err, value) {
-                    if (err) {
-                        error(err);
-                        return;
-                    }
+        const inParams = [];
+        inParams.push(query || []);
+        inParams.push(fields || []);
+        inParams.push(from); // offset
+        inParams.push(limit); // limit
 
-                    if (value.length >= limit) {
-                        self.logger.info("continue search %s at %s", model, from + limit);
-                        self.searchOneIncremental(odoo, model, query, fields, from + limit)
-                            .then(function (res) {
-                                success(value.concat(res));
-                            });
-                        return;
-                    }
-                    self.logger.info("search completed on %s with %s elements", model, value.length);
-                    success(value);
-                });
-        });
+        return odoo.execute_kw(model, OdooOperation.searchRead, inParams)
+            .then(value => {
+                if (value.length >= limit) {
+                    self.logger.debug("continue search %s at %s", model, from + limit);
+                    return self.searchOneIncremental(odoo, model, query, fields, from + limit);
+                }
+                self.logger.debug("search completed on %s with %s elements", model, value.length);
+                return value;
+            });
     }
 
     /**
@@ -209,28 +188,13 @@ export class OdooRpc implements IOdooRpc {
      */
     public countOneCompany(company: OdooCompany, model, query = []): Promise<OdooCountResult> {
         const self = this;
-        return new Promise(function (success, error) {
-            self.getOdooConnection(company)
-                .then(odoo => {
-                    const inParams = [];
-                    inParams.push(query || []);
-
-                    const params = [];
-                    params.push(inParams);
-                    odoo.execute_kw(model, OdooOperation.searchCount, params,
-                        function (err, value) {
-                            if (err) {
-                                error(err);
-                                return;
-                            }
-                            self.logger.info("count completed on %s with %s elements", model, value);
-                            success(value);
-                        });
-                });
-        })
-            .catch(function (err) {
-                self.logger.error(err);
-                throw new Error(err);
+        return self.getOdooConnection(company)
+            .then(odoo => {
+                return odoo.execute_kw(model, OdooOperation.searchCount, [query || []])
+                    .then(value => {
+                        self.logger.debug("count completed on %s with %s elements", model, value);
+                        return value;
+                    });
             })
             .then(res => {
                 const t = new OdooCountResult();
@@ -271,7 +235,7 @@ export class OdooRpc implements IOdooRpc {
 
     /**
      * Get count of something from Odoo
-     * @returns {Promise<any>}
+     * @returns {Promise<OdooCountResult>}
      */
     public count(company: OdooCompany | OdooCompany[], model, query = []): Promise<OdooCountResult[]> {
         if (company === undefined || company === null) {
@@ -351,7 +315,7 @@ export class OdooRpc implements IOdooRpc {
     /**
      * Get Number of promises and limit per promise based on a result Count
      * @param {number} count
-     * @returns {{nbPromises: number; limitPerPromise: number}}
+     * @returns {nbPromises: number; limitPerPromise: number}
      */
     protected getNbPromises(count: number) {
         let nbPromises = this.xmlRpcConfig.maxConcurrentCalls;
@@ -404,30 +368,13 @@ export class OdooRpc implements IOdooRpc {
      * @returns {Promise<OdooCountResult>}
      */
     public readOneCompany(company: OdooCompany, model, query = [], fields = []): Promise<OdooSearchResult> {
-        const self = this;
-        return new Promise(function (success, error) {
-            self.getOdooConnection(company)
-                .then(odoo => {
-                    const inParams = [];
-                    inParams.push(query || []);
-                    inParams.push(fields || []);
+        return this.getOdooConnection(company)
+            .then(odoo => {
+                const inParams = [];
+                inParams.push(query || []);
+                inParams.push(fields || []);
 
-                    const params = [];
-                    params.push(inParams);
-                    odoo.execute_kw(model, OdooOperation.read, params,
-                        function (err, value) {
-                            if (err) {
-                                error(err);
-                                return;
-                            }
-                            self.logger.info("count completed on %s with %s elements", model, value);
-                            success(value);
-                        });
-                });
-        })
-            .catch(function (err) {
-                self.logger.error(err);
-                throw new Error(err);
+                return odoo.execute_kw(model, OdooOperation.read, inParams);
             })
             .then(res => {
                 const t = new OdooSearchResult();
