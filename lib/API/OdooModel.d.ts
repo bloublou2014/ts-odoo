@@ -7,6 +7,10 @@ export declare class OdooModel {
     protected config: OdooConfiguration;
     protected odoo: OdooRpc;
     protected model: string;
+    protected fieldsModel: string;
     protected fields: string[];
+    protected fieldsFields: string[];
     getModels(query?: any[], fields?: any[]): Promise<OdooSearchResult[]>;
+    getFieldsByIds(ids: number[]): Promise<OdooSearchResult[]>;
+    getFields(query?: any[], fields?: any[]): Promise<OdooSearchResult[]>;
 }

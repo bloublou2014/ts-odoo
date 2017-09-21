@@ -1,4 +1,3 @@
-import * as OdooXmlRpc from "odoo-xmlrpc";
 import { ILogger } from "../Logger/ILogger";
 import { OdooConfiguration } from "../Config/OdooConfiguration";
 import { OdooCompany } from "../Config/OdooCompany";
@@ -7,6 +6,7 @@ import { Company } from "../Entities/Common/Company";
 import { OdooCountResult } from "./OdooCountResult";
 import { OdooXmlRpcConfiguration } from "../Config/OdooXmlRpcConfiguration";
 import { IOdooRpc } from "./IOdooRpc";
+import { OdooXmlRpc } from "./OdooXmlRpc";
 export declare class OdooRpc implements IOdooRpc {
     logger: ILogger;
     protected config: OdooConfiguration;
@@ -14,7 +14,7 @@ export declare class OdooRpc implements IOdooRpc {
     protected connectionCache: any;
     /**
      * Create and Get
-     * @returns {any}
+     * @returns any
      */
     protected getCache(): any;
     /**
@@ -22,7 +22,7 @@ export declare class OdooRpc implements IOdooRpc {
      * @param {OdooCompany} company
      * @returns {}
      */
-    protected getCachedConnection(company: OdooCompany): OdooXmlRpc;
+    protected getCachedConnection(company: OdooCompany): Promise<OdooXmlRpc>;
     /**
      * Set connection to cache
      * @param {OdooCompany} company
@@ -61,7 +61,7 @@ export declare class OdooRpc implements IOdooRpc {
      * @param {number} limit
      * @returns {Promise}
      */
-    protected searchOneIncremental(odoo: OdooXmlRpc, model: string, query?: any[], fields?: any[], from?: number, limit?: number): Promise<{}>;
+    protected searchOneIncremental(odoo: OdooXmlRpc, model: string, query?: any[], fields?: any[], from?: number, limit?: number): Promise<any>;
     /**
      * Count number of items on One company
      * @param {OdooCompany} company
@@ -88,7 +88,7 @@ export declare class OdooRpc implements IOdooRpc {
     searchRead(company: OdooCompany | OdooCompany[], model: any, query?: any[], fields?: any[], from?: number, limit?: any): Promise<OdooSearchResult[]>;
     /**
      * Get count of something from Odoo
-     * @returns {Promise<any>}
+     * @returns {Promise<OdooCountResult>}
      */
     count(company: OdooCompany | OdooCompany[], model: any, query?: any[]): Promise<OdooCountResult[]>;
     /**
@@ -111,7 +111,7 @@ export declare class OdooRpc implements IOdooRpc {
     /**
      * Get Number of promises and limit per promise based on a result Count
      * @param {number} count
-     * @returns {{nbPromises: number; limitPerPromise: number}}
+     * @returns {nbPromises: number; limitPerPromise: number}
      */
     protected getNbPromises(count: number): {
         nbPromises: number;

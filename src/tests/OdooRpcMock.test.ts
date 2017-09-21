@@ -35,7 +35,7 @@ export class OdooRpcMockTest {
     }
 
     @AsyncTest()
-    @Timeout(15000)
+    @Timeout(250000)
     public async shouldGetModel() {
         const odoo = this.getOdoo();
         Expect(odoo).toBeDefined();
@@ -43,6 +43,10 @@ export class OdooRpcMockTest {
         Expect(model).toBeDefined();
         const result = await model.getModels();
         Expect(result).toBeDefined();
+        console.log(result);
+        // take all fields ids
+
+
     }
 
 }
